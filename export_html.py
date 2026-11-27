@@ -66,8 +66,12 @@ def main():
         cmd += ["--metadata", f"footer={args.footer}"]
 
     if args.no_highlight:
+        # # 无--syntax-highlighting.参数时手动改一下这个注释
+        # cmd += ["--highlight-style", "monochrome"]
         cmd += ["--syntax-highlighting", "monochrome"]
     else:
+        # # 无--syntax-highlighting.参数时手动改一下这个注释
+        # cmd += ["--highlight-style", "tango"]
         cmd += ["--syntax-highlighting", "tango"]
 
     try:
