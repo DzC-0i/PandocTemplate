@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PandocTemplate</title>
+<style>
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#f3f6fa;color:#182635;font:16px/1.8 "Microsoft YaHei","Noto Sans CJK SC",sans-serif}
+header{background:#163c57;color:white;padding:24px max(28px,calc((100vw - 1280px)/2));font-size:22px;font-weight:700}
+header small{display:block;font-size:13px;font-weight:400;color:#c8dfec}
+main{display:grid;grid-template-columns:240px minmax(0,1fr);gap:24px;max-width:1320px;margin:24px auto;padding:0 20px}
+nav#TOC{position:sticky;top:20px;align-self:start;max-height:calc(100vh - 40px);overflow:auto;font-size:13px;background:white;border-radius:10px;padding:18px}
+nav#TOC a{color:#285773;text-decoration:none}
+nav#TOC ul{padding-left:18px;margin:0}
+nav#TOC > ul{list-style:none;padding-left:0}
+article{min-width:0;background:white;border:1px solid #e2e9ef;border-radius:12px;padding:32px 40px}
+h1{font-size:28px;line-height:1.45;margin:0 0 18px}
+h2{font-size:23px;border-bottom:2px solid #d7e7f0;padding-bottom:8px;margin-top:44px;scroll-margin-top:20px}
+h3{font-size:19px;margin-top:30px}
+p,li,td{overflow-wrap:anywhere}
+p{margin:12px 0}
+a{color:#12618b}
+table{width:100%;border-collapse:collapse;font-size:14px;margin:18px 0}
+th{background:#eaf2f7;text-align:left;color:#183f58}
+th,td{border:1px solid #d7e2eb;padding:9px 12px;vertical-align:top}
+tr:nth-child(even) td{background:#f8fafc}
+code{font:13px/1.65 Consolas,"Noto Sans Mono CJK SC",monospace;background:#eef3f7;padding:2px 4px;border-radius:3px;overflow-wrap:anywhere}
+pre{background:#112b3d;color:#e8f3fa;padding:18px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;color:inherit;white-space:pre;overflow-wrap:normal}
+strong{color:#114e71}
+button{border:0;border-radius:6px;padding:8px 14px;background:#e3f0f7;color:#163c57;cursor:pointer}
+footer{padding:10px 28px 30px;text-align:center;color:#607688;font-size:13px}
+
+blockquote, div.tip, div.note {
+    margin: 18px 0; padding: 12px 18px;
+    background-color: #fff8e6; border-left: 5px solid #f1c40f; border-radius: 0 8px 8px 0; color: #333;
+}
+div.warning { margin: 18px 0; padding: 12px 18px; background-color: #fdf2f2; border-left: 5px solid #e74c3c; border-radius: 0 8px 8px 0; }
+div.info { margin: 18px 0; padding: 12px 18px; background-color: #eef7ff; border-left: 5px solid #3498db; border-radius: 0 8px 8px 0; }
+blockquote p:first-child, div.tip p:first-child, div.warning p:first-child, div.info p:first-child { margin-top: 0; }
+blockquote p:last-child, div.tip p:last-child, div.warning p:last-child, div.info p:last-child { margin-bottom: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 6px; display: block; margin: 16px 0; }
+kbd { background: #f3f4f6; border: 1px solid #d1d5db; border-bottom-width: 2px; border-radius: 4px; padding: 2px 6px; font-family: Consolas, monospace; font-size: 13px; color: #374151; }
+ul.task-list { list-style-type: none; padding-left: 0; }
+ul.task-list input[type="checkbox"] { margin-right: 8px; vertical-align: middle; transform: scale(1.15); }
+details { background: #f8fafc; border: 1px solid #d7e2eb; border-radius: 8px; padding: 10px 14px; margin: 16px 0; }
+details summary { cursor: pointer; font-weight: bold; color: #114e71; user-select: none; }
+details[open] summary { margin-bottom: 10px; border-bottom: 1px dashed #d7e2eb; padding-bottom: 8px; }
+.footnotes {font-size: 14px;color: #607688;}
+.footnotes ol {padding-left: 20px;}
+thead { display: table-header-group; }
+
+pre { position: relative; }
+.copy-btn { position: absolute; top: 8px; right: 8px; padding: 4px 10px; background: rgba(255, 255, 255, 0.15); color: #c8dfec; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 4px; font-size: 12px; cursor: pointer; transition: all 0.2s ease; opacity: 0; }
+pre:hover .copy-btn { opacity: 1; }
+.copy-btn:hover { background: rgba(255, 255, 255, 0.3); color: #fff; }
+.copy-btn.copied { background: #2ecc71; color: white; border-color: #2ecc71; }
+
+@media(max-width:900px){main{display:block}nav#TOC{position:static;max-height:220px;margin-bottom:20px}article{padding:22px}table{font-size:12px}th,td{padding:7px}}
+@media print{body{background:white;font-size:10pt}header,nav#TOC,button,footer{display:none}main{display:block;margin:0;padding:0}article{border:0;padding:0}h2,h3{break-after:avoid}tr{break-inside:avoid}pre{white-space:pre-wrap;background:#edf3f7;color:#102c3e;break-inside:avoid}pre code{white-space:pre-wrap;color:inherit}a{color:inherit;text-decoration:none}h1{font-size:22pt}h2{font-size:16pt}table{font-size:9pt} .copy-btn { display: none !important; }}
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  background-color: #f8f8f8; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } /* Alert */
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #204a87; } /* Attribute */
+code span.bn { color: #0000cf; } /* BaseN */
+code span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4e9a06; } /* Char */
+code span.cn { color: #8f5902; } /* Constant */
+code span.co { color: #8f5902; font-style: italic; } /* Comment */
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+code span.dt { color: #204a87; } /* DataType */
+code span.dv { color: #0000cf; } /* DecVal */
+code span.er { color: #a40000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #0000cf; } /* Float */
+code span.fu { color: #204a87; font-weight: bold; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+code span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+code span.ot { color: #8f5902; } /* Other */
+code span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+code span.sc { color: #ce5c00; font-weight: bold; } /* SpecialChar */
+code span.ss { color: #4e9a06; } /* SpecialString */
+code span.st { color: #4e9a06; } /* String */
+code span.va { color: #000000; } /* Variable */
+code span.vs { color: #4e9a06; } /* VerbatimString */
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+</head>
+<body>
+<header>PandocTemplate<small>DzC-0i / PandocTemplate · 2026-11-27
+17:39</small></header>
+<main>
+<nav id="TOC"><button onclick="window.print()">打印／保存PDF</button>
+<ul>
+<li><a href="#pandoctemplate" id="toc-pandoctemplate">PandocTemplate</a>
+<ul>
+<li><a href="#特性" id="toc-特性">✨ 特性</a></li>
+<li><a href="#目录结构" id="toc-目录结构">📦 目录结构</a></li>
+<li><a href="#环境依赖" id="toc-环境依赖">🛠️ 环境依赖</a>
+<ul>
+<li><a href="#安装-pandoc" id="toc-安装-pandoc">安装 Pandoc</a></li>
+</ul></li>
+<li><a href="#快速开始" id="toc-快速开始">🚀 快速开始</a>
+<ul>
+<li><a href="#常用命令示例" id="toc-常用命令示例">常用命令示例</a></li>
+<li><a href="#完整参数" id="toc-完整参数">完整参数</a></li>
+</ul></li>
+<li><a href="#使用小技巧" id="toc-使用小技巧">🎯 使用小技巧</a>
+<ul>
+<li><a href="#在-markdown-中写彩色提示框"
+id="toc-在-markdown-中写彩色提示框">在 Markdown 中写彩色提示框</a></li>
+<li><a href="#打印-保存-pdf" id="toc-打印-保存-pdf">打印 / 保存
+PDF</a></li>
+<li><a href="#自定义样式" id="toc-自定义样式">自定义样式</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+<article>
+<h1 id="pandoctemplate">PandocTemplate</h1>
+<p>一个简单好用的 <strong>Markdown → HTML</strong> 导出方案，基于 <a
+href="https://pandoc.org/">Pandoc</a> 和自定义 HTML 模板。</p>
+<h2 id="特性">✨ 特性</h2>
+<ul>
+<li>🎨 现代化深蓝配色主题，阅读体验舒适</li>
+<li>📑 <strong>自动生成侧边栏目录</strong>（TOC，最多 3
+级），粘性定位跟随滚动</li>
+<li>💻 代码块 <strong>语法高亮</strong>（tango 主题），鼠标悬停显示
+<strong>一键复制</strong> 按钮</li>
+<li>🏷️ 支持 Pandoc fenced div 语法：<code>:::tip</code> /
+<code>:::warning</code> / <code>:::info</code> 彩色提示框</li>
+<li>⌨️ <code>&lt;kbd&gt;</code> 键盘按键样式、任务列表
+(<code>- [x]</code>)、脚注、图片自适应</li>
+<li>🖨️ <strong>打印/导出 PDF
+友好</strong>（模板内置打印样式，侧边栏自动隐藏）</li>
+<li>🔤 自动识别文档一级标题作为页面标题，副标题默认显示用户名 / 目录 ·
+时间</li>
+<li>🖱️ 锚点平滑滚动、移动端响应式布局</li>
+</ul>
+<h2 id="目录结构">📦 目录结构</h2>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">PandocTemplate/</span> </span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> export_html.py <span class="co"># Python 导出脚本 </span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">└──</span> template.html <span class="co"># Pandoc 自定义 HTML 模板</span></span></code></pre></div>
+<h2 id="环境依赖">🛠️ 环境依赖</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>依赖</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Python ≥ 3.6</td>
+<td>已安装即可，无需额外第三方库</td>
+</tr>
+<tr>
+<td><a href="https://pandoc.org/installing.html">Pandoc</a></td>
+<td>必须安装并加入系统 PATH</td>
+</tr>
+</tbody>
+</table>
+<h3 id="安装-pandoc">安装 Pandoc</h3>
+<ul>
+<li><strong>Windows</strong>：访问 <a
+href="https://pandoc.org/installing.html">pandoc.org/installing.html</a>
+下载安装包，或用 <code>winget install Pandoc.Pandoc</code></li>
+<li><strong>Linux</strong>：<code>sudo apt install pandoc</code> 或
+<code>sudo pacman -S pandoc</code></li>
+<li><strong>macOS</strong>：<code>brew install pandoc</code></li>
+</ul>
+<h2 id="快速开始">🚀 快速开始</h2>
+<p>最简单的用法——一行命令导出：</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> export_html.py example.md</span></code></pre></div>
+<p>这会在同目录下生成 <code>example.html</code>，标题自动取文档第一个
+<code>#</code> 一级标题。</p>
+<h3 id="常用命令示例">常用命令示例</h3>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 指定输出文件路径</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> export_html.py example.md <span class="at">-o</span> output/report.html</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 自定义页面标题和副标题</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> export_html.py example.md <span class="at">--title</span> <span class="st">&quot;我的文档&quot;</span> <span class="at">--subtitle</span> <span class="st">&quot;2026年度&quot;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 添加页脚文字</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> export_html.py example.md <span class="at">--footer</span> <span class="st">&quot;© 2026 My Company&quot;</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 关闭彩色语法高亮（改用单色）</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> export_html.py example.md <span class="at">--no-highlight</span></span></code></pre></div>
+<h3 id="完整参数">完整参数</h3>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+<th>默认值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>md</code></td>
+<td>输入的 Markdown 文件路径（位置参数，必填）</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>-o</code>, <code>--output</code></td>
+<td>输出 HTML 路径</td>
+<td>与输入同名 <code>.html</code></td>
+</tr>
+<tr>
+<td><code>-t</code>, <code>--title</code></td>
+<td>页面标题</td>
+<td>文档首个 <code>#</code> 标题，否则用文件名</td>
+</tr>
+<tr>
+<td><code>-s</code>, <code>--subtitle</code></td>
+<td>横幅副标题</td>
+<td>用户名 / 目录 · 当前时间</td>
+</tr>
+<tr>
+<td><code>-f</code>, <code>--footer</code></td>
+<td>页脚文字</td>
+<td>无页脚</td>
+</tr>
+<tr>
+<td><code>--no-highlight</code></td>
+<td>关闭彩色语法高亮</td>
+<td><code>false</code>（使用 tango 主题）</td>
+</tr>
+</tbody>
+</table>
+<h2 id="使用小技巧">🎯 使用小技巧</h2>
+<h3 id="在-markdown-中写彩色提示框">在 Markdown 中写彩色提示框</h3>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>:::tip</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>这是一个小技巧提示。</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>:::warning</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>⚠️ 注意事项，左边红色边框。</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>:::info</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>ℹ️ 信息提示，左边蓝色边框。</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>:::</span></code></pre></div>
+<h3 id="打印-保存-pdf">打印 / 保存 PDF</h3>
+<p>导出的 HTML 页面右上角有 <strong>“打印／保存PDF”</strong>
+按钮，点击后浏览器会弹出打印对话框。建议在打印设置中： - 纸张方向：纵向
+- 边距：默认或最小 - 勾选 <strong>背景图形</strong>（Chrome/Edge
+中）以保留页面底色</p>
+<h3 id="自定义样式">自定义样式</h3>
+<p><code>template.html</code> 是标准 Pandoc 模板，顶部
+<code>&lt;style&gt;</code> 中的 CSS 可以自由修改。例如想换主题色，把
+<code>#163c57</code>（深蓝）替换成你喜欢的颜色即可。</p>
+</article>
+</main>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll("pre").forEach(function(pre) {
+        let btn = document.createElement("button");
+        btn.className = "copy-btn";
+        btn.innerText = "复制";
+
+        btn.addEventListener("click", function() {
+            let codeEl = pre.querySelector("code") || pre;
+            let textToCopy = codeEl.innerText;
+
+            navigator.clipboard.writeText(textToCopy).then(function() {
+                btn.innerText = "已复制!";
+                btn.classList.add("copied");
+                setTimeout(function() {
+                    btn.innerText = "复制";
+                    btn.classList.remove("copied");
+                }, 2000);
+            }).catch(function(err) {
+                console.error("复制失败: ", err);
+                btn.innerText = "复制失败";
+            });
+        });
+
+        pre.appendChild(btn);
+    });
+});
+</script>
+</body>
+</html>
